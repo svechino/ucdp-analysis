@@ -6,17 +6,23 @@ import plotly.io as pio
 from dash.dependencies import Output, Input
 
 pio.templates.default = "plotly_dark"
-df = pd.read_csv(r"C:\Users\97252\Desktop\Practicum\Charm Data\combined_ged_event_data.csv", low_memory=False)
+df = pd.read_parquet('combined_ged_event_data.parquet', engine='pyarrow')
 
 def create_decade(year):
     return f'{(year // 10) *10}s'
 
 df['decade'] = df['year'].apply(create_decade)
-
+available_years = ['All'] + sorted(df['year'].unique())
 available_decades = ['All'] + sorted(df['decade'].unique())
 available_regions = ['All'] + sorted(df['region'].unique())
 available_types_of_violence = {
     'All': 'All Types',
+    1: 'State-based conflict',
+    2: 'Non-state conflict',
+    3: 'One-sided violence'
+}
+
+violence_type_labels = {
     1: 'State-based conflict',
     2: 'Non-state conflict',
     3: 'One-sided violence'
@@ -33,12 +39,22 @@ app.layout = dbc.Container([
             html.Label('Dark Mode', style={'color': 'white', 'marginRight': '10px'}),
             dbc.Switch(
                 id='theme-switch',
-                value=True,  # Темная тема по умолчанию
+                value=True,
                 style={'display': 'inline-block'}
             )
-        ], width=4, style={'textAlign': 'right'})
+        ], width=3, style={'textAlign': 'right'})
     ], className="mb-4"),
     dbc.Row([
+        dbc.Col([
+            html.Label("Select Year", id='year-label', style={'color': 'white'}),
+            dcc.Dropdown(
+                id='year-filter',
+                options=[{'label': str(year), 'value': year} for year in available_years],
+                value=['All'],
+                multi=True,
+                clearable=False
+            )
+        ], width=3),
         dbc.Col([
             html.Label("Select Decade", id='decade-label', style={'color': 'white'}),
             dcc.Dropdown(
@@ -47,7 +63,7 @@ app.layout = dbc.Container([
                 value='All',
                 clearable=False
             )
-        ], width=4),
+        ], width=3),
         dbc.Col([
             html.Label("Select Region", id='region-label', style={'color': 'white'}),
             dcc.Dropdown(
@@ -56,7 +72,7 @@ app.layout = dbc.Container([
                 value='All',
                 clearable=False
             )
-        ], width=4),
+        ], width=3),
         dbc.Col([
             html.Label("Select Type of Violence", id='violence-label', style={'color': 'white'}),
             dcc.Dropdown(
@@ -65,7 +81,7 @@ app.layout = dbc.Container([
                 value='All',
                 clearable=False
             )
-        ], width=4)
+        ], width=3)
     ]),
     dbc.Row([
         dbc.Col(
@@ -86,6 +102,7 @@ app.layout = dbc.Container([
 @app.callback(
     [Output('page-content', 'style'),
      Output('page-title', 'style'),
+     Output('year-label', 'style'),
      Output('decade-label', 'style'),
      Output('region-label', 'style'),
      Output('violence-label', 'style')],
@@ -99,21 +116,25 @@ def update_theme(is_dark):
         page_style = {'backgroundColor': '#ffffff'}
         text_style = {'color': 'black'}
 
-    return page_style, text_style, text_style, text_style, text_style
+    return page_style, text_style, text_style, text_style, text_style, text_style
 
 @app.callback(
     [Output('time-series-graph', 'figure'),
      Output('mortality-pie-chart', 'figure'),
      Output('event-map', 'figure')],
-    [Input('decade-filter', 'value'),
+    [Input('year-filter', 'value'),
+     Input('decade-filter', 'value'),
      Input('region-filter', 'value'),
      Input('violence-filter', 'value'),
      Input('theme-switch', 'value')]
 )
 
-def update_graphs(selected_decade, selected_region, selected_violence_type, is_dark):
+def update_graphs(selected_years, selected_decade, selected_region, selected_violence_type, is_dark):
     template = 'plotly_dark' if is_dark else 'plotly'
     filtered_df = df.copy()
+
+    if 'All' not in selected_years:
+        filtered_df = filtered_df[filtered_df['year'].isin(selected_years)]
 
     if selected_decade != 'All':
         filtered_df = filtered_df[filtered_df['decade']==selected_decade]
@@ -156,14 +177,24 @@ def update_graphs(selected_decade, selected_region, selected_violence_type, is_d
     pie_chart_fig.update_traces(textinfo='label+percent', showlegend=True)
 
     # Event Map
+    filtered_df['type_of_violence'] = filtered_df['type_of_violence'].map(violence_type_labels)
     event_map_fig = px.scatter_mapbox(filtered_df, lat='latitude', lon="longitude",
                                       size="best", color="region", hover_name="country",
-                                      hover_data={"year": True, "type_of_violence": True, "best": True, "latitude":False, "longitude":False},
+                                      hover_data={"year": True,
+                                                  "type_of_violence": True,
+                                                  "best": ':.0f',
+                                                  "latitude":False,
+                                                  "longitude":False},
                                       zoom=1, height=600, title="Geographical Distribution of Conflict Events",
                                       mapbox_style="carto-darkmatter" if is_dark else "carto-positron",
                                       template=template
     )
     event_map_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)' if is_dark else 'rgba(255,255,255,1)')
+    event_map_fig.update_traces(
+        hovertemplate="<b>Country: %{hovertext}</b><br>" +
+                  "Year: %{customdata[0]}<br>" +
+                  "Type of Violence: %{customdata[1]}<br>" +
+                  "Most Likely Deaths: %{marker.size}<br>")
 
     return time_series_fig, pie_chart_fig, event_map_fig
 
