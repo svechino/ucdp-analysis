@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.io as pio
 from dash.dependencies import Output, Input
+import os
 
 pio.templates.default = "plotly_dark"
 df = pd.read_parquet('combined_ged_event_data.parquet', engine='pyarrow')
@@ -198,5 +199,5 @@ def update_graphs(selected_years, selected_decade, selected_region, selected_vio
 
     return time_series_fig, pie_chart_fig, event_map_fig
 
-if __name__ == '__main__':
-    app.run_server(debug=True)
+if __name__ == "__main__":
+    app.run_server(host='0.0.0.0', port=int(os.environ.get("PORT", 8050)))
