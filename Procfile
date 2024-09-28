@@ -1,1 +1,1 @@
-web: gunicorn Visualization:app
+web: gunicorn Visualization:app.server
