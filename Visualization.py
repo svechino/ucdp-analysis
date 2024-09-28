@@ -179,7 +179,6 @@ def update_graphs(selected_years, selected_decade, selected_region, selected_vio
     return time_series_fig, pie_chart_fig, event_map_fig
 
 
-# Запуск приложения
 if __name__ == "__main__":
     app.run_server(host='0.0.0.0', port=int(os.environ.get("PORT", 8050)))
 
