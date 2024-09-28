@@ -10,8 +10,8 @@ import os
 pio.templates.default = "plotly_dark"
 
 # file optimization
-necessary_columns = ['year', 'type_of_violence', 'region', 'latitude', 'longitude', 'deaths_a', 'deaths_b', 'deaths_civilians', 'best', 'conflict_name']
-df = pd.read_parquet('combined_ged_event_data.parquet', engine='pyarrow', columns=necessary_columns)
+#necessary_columns = ['year', 'type_of_violence', 'region', 'latitude', 'longitude', 'deaths_a', 'deaths_b', 'deaths_civilians', 'best', 'conflict_name']
+df = pd.read_parquet('combined_ged_event_data.parquet', engine='pyarrow')
 
 
 # Decades function
