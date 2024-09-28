@@ -9,7 +9,7 @@ import os
 # Dark theme by default
 pio.templates.default = "plotly_dark"
 
-# Загружаем только необходимые столбцы из Parquet файла для экономии памяти
+# file optimization
 necessary_columns = ['year', 'type_of_violence', 'region', 'latitude', 'longitude', 'deaths_a', 'deaths_b', 'deaths_civilians', 'best', 'conflict_name']
 df = pd.read_parquet('combined_ged_event_data.parquet', engine='pyarrow', columns=necessary_columns)
 
@@ -88,7 +88,7 @@ app.layout = dbc.Container([
 ], fluid=True, id='page-content', style={'backgroundColor': '#2b2b2b'})
 
 
-# Callback theme
+# Callback theme:
 @app.callback(
     [Output('page-content', 'style'),
      Output('page-title', 'style'),
