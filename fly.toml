@@ -9,9 +9,6 @@ primary_region = 'cdg'
 [deploy]
 release_command = "gunicorn -b 0.0.0.0:8080 Visualization:app"
 
-[env]
-  PORT = '8080'
-
 [http_service]
   internal_port = 8080
   force_https = true
