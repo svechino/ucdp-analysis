@@ -6,8 +6,8 @@
 app = 'ucdp-project'
 primary_region = 'cdg'
 
-[build]
-  builder = 'paketobuildpacks/builder:base'
+[deploy]
+  release_command = "gunicorn <имя_файла_без_расширения>:app -b 0.0.0.0:8080"
 
 [env]
   PORT = '8080'
