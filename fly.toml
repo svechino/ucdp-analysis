@@ -7,7 +7,7 @@ app = 'ucdp-project'
 primary_region = 'cdg'
 
 [deploy]
-  release_command = "gunicorn Visualization:app -b 0.0.0.0:8080"
+release_command = "gunicorn -b 0.0.0.0:8080 Visualization:server"
 
 [env]
   PORT = '8080'
