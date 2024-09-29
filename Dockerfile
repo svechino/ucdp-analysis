@@ -18,4 +18,4 @@ ENV PORT=8080
 EXPOSE 8080
 
 # Запускаем приложение
-CMD ["gunicorn", "Visualization:app", "-b", "0.0.0.0:8080"]
+CMD ["python", "Visualization.py"]
