@@ -9,9 +9,8 @@ import os
 # Dark theme by default
 pio.templates.default = "plotly_dark"
 
-# file optimization
-#necessary_columns = ['year', 'type_of_violence', 'region', 'latitude', 'longitude', 'deaths_a', 'deaths_b', 'deaths_civilians', 'best', 'conflict_name']
-df = pd.read_parquet('combined_ged_event_data.parquet', engine='pyarrow')
+necessary_columns = ['year', 'type_of_violence', 'region', 'latitude', 'longitude', 'deaths_a', 'deaths_b', 'deaths_civilians', 'best', 'conflict_name', 'country']
+df = pd.read_parquet('combined_ged_event_data.parquet', engine='pyarrow', columns=necessary_columns)
 
 
 # Decades function
@@ -123,18 +122,15 @@ def update_theme(is_dark):
 def update_graphs(selected_years, selected_decade, selected_region, selected_violence_type, is_dark):
     template = 'plotly_dark' if is_dark else 'plotly'
     filtered_df = df.copy()
-
     if 'All' not in selected_years:
         filtered_df = filtered_df[filtered_df['year'].isin(selected_years)]
-
     if selected_decade != 'All':
         filtered_df = filtered_df[filtered_df['decade'] == selected_decade]
-
     if selected_region != 'All':
         filtered_df = filtered_df[filtered_df['region'] == selected_region]
-
     if selected_violence_type != 'All':
         filtered_df = filtered_df[filtered_df['type_of_violence'] == selected_violence_type]
+
     # Line graph
     conflicts_per_year = filtered_df.groupby('year')['conflict_name'].nunique().reset_index(
         name='unique_conflict_count')
