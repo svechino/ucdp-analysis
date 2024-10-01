@@ -3,8 +3,8 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'ucdp-project'
-primary_region = 'cdg'
+app = "ucdp-project"
+primary_region = "cdg"
 
 [deploy]
 release_command = "gunicorn -b 0.0.0.0:8080 Visualization:server"
@@ -12,12 +12,22 @@ release_command = "gunicorn -b 0.0.0.0:8080 Visualization:server"
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = 'stop'
+  auto_stop_machines = "stop"
   auto_start_machines = true
   min_machines_running = 0
-  processes = ['app']
+  processes = ["app"]
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+  processes = ["app"]
+
+  [services.concurrency]
+    type = "connections"
+    soft_limit = 20
+    hard_limit = 25
 
 [[vm]]
-  memory = '1gb'
-  cpu_kind = 'shared'
-  cpus = 1
+  cpu_kind = "shared"
+  cpus = 2
+  memory = 2048

@@ -36,6 +36,7 @@ violence_type_labels = {
 }
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.CYBORG])
+server = app.server
 
 app.layout = dbc.Container([
     dbc.Row([
