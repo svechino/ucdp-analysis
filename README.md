@@ -27,6 +27,16 @@ Filter by **year, region, and type of violence** to uncover patterns in armed co
 
 ---
 
+## 📚 Inspiration
+
+This project was inspired by a desire to make global conflict data more accessible and transparent.  
+Civilian casualties are often hidden in raw numbers — I wanted to build a tool that lets people see the human impact behind the data.
+
+The dashboard was created as part of my data analytics portfolio and also developed in collaboration with the [Charming Data](https://charming-data.circle.so/c/ai-python-projects/) community — a space for building open-source AI & Python apps together.  
+It served as an experiment in designing clean, interactive data visualizations that spark curiosity and invite exploration.
+
+---
+
 ## 📂 Dataset  
 
 The dataset includes information on conflicts worldwide, sourced from **UCDP (Uppsala Conflict Data Program)**. It contains:  
